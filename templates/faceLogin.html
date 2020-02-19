@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>FACE LOGIN</title>
+    <meta charset="utf-8">
+	<script src="../static/js/jquery-3.2.1.min.js"></script>
+	<script src="../static/js/ccv.js"></script>
+	<script src="../static/js/cascade.js"></script>
+	<script src="../static/js/jquery.facedetection.js"></script>
+	<style>
+		body {
+		    text-align: center;
+			background-image:url(../static/background1.jpg);
+		    color: white;
+		    font-size:40px;
+		    margin:auto;
+		}
+		
+	</style>
+</head>
+<body>
+<h1>FACE LOGIN</h1>
+<hr>
+
+<div class="video-container-2" >
+    <video id="video" width="400" height="300" muted class="abs" style="display: none;"></video>
+	<canvas id="canvas" width="400" height="300" style="background:#c0c0c0;"></canvas>
+    <br>
+	<hr>
+<input type="button" title="开启摄像头" value="开启摄像头" onclick="getMedia()" />
+<input type="button" title="点击换一张" value="点击换一张" onclick="change_img()" />
+<strong>{{ message }}</strong></div>
+<script>
+    //获得video摄像头区域
+    let video = document.getElementById("video");
+    let canvas = document.getElementById("canvas");
+    let ctx = canvas.getContext('2d');
+    function getMedia() {
+        let constraints = {
+            video: {width: 400, height: 300},
+            audio: false
+        };
+        /*
+        这里介绍新的方法:H5新媒体接口 navigator.mediaDevices.getUserMedia()
+        这个方法会提示用户是否允许媒体输入,(媒体输入主要包括相机,视频采集设备,屏幕共享服务,麦克风,A/D转换器等)
+        返回的是一个Promise对象。
+        如果用户同意使用权限,则会将 MediaStream对象作为resolve()的参数传给then()
+        如果用户拒绝使用权限,或者请求的媒体资源不可用,则会将 PermissionDeniedError作为reject()的参数传给catch()
+        */
+        let promise = navigator.mediaDevices.getUserMedia(constraints);
+        promise.then(function (MediaStream) {
+            video.srcObject = MediaStream;
+            video.play();
+        }).catch(function (PermissionDeniedError) {
+            console.log(PermissionDeniedError);
+        })
+		is_stop=0
+        video.ontimeupdate=function () {
+				if(is_stop) return
+                ctx.drawImage(video, 0, 0, video.width, video.height);
+				var base64 = canvas.toDataURL('images/png');
+				base64 = base64.split(',')[1]
+    			$('#canvas').faceDetection({
+                    complete: function (faces) {
+                        if(faces.length>=1){
+                            is_stop = 1;
+                            draw_face_box(faces)
+                            upload(base64)
+
+                        }
+                        console.log(faces)
+                    }
+                });
+            }
+			//上传人脸图片
+            function upload(base64) {
+                $.ajax({
+                    "type":"POST",
+                    "url":"/upload",
+                    "data":{'img':base64},
+                    'dataType':'json',
+                    beforeSend:function(){},
+                    success:function(result){
+					if (result=='1'){
+						data = "识别成功"
+						alert("登陆成功，点击跳转...")
+						window.location.href='/stream';
+						/*setTimeout(function(){
+                        	window.location.href='/stream';
+                        },3000)
+                       	return;*/
+					}
+					else{
+						data = "识别失败"
+						}
+					alert(data)
+					return
+                        //console.log(result)
+                        //img_path = result.data.file_path
+                    }
+                });
+            }
+		//画出人脸区域
+    	function draw_face_box(faces) {
+    		var rect;
+        	var i;
+        	//ctx.clearRect(0, 0, canvas.width, canvas.height);
+        	for(i=0;i<faces.length;i++) {
+            	rect = faces[i];
+            	ctx.strokeStyle = '#a64ceb';
+            	//if(rect.width<30) return
+            	ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
+            	ctx.font = '15px Helvetica';
+            	ctx.fillStyle = "#fff";
+            	ctx.fillText('x: ' + rect.x + 'px', rect.x + rect.width + 5, rect.y + 11);
+            	ctx.fillText('y: ' + rect.y + 'px', rect.x + rect.width + 5, rect.y + 22);
+        	}
+    	}
+    }
+
+	function change_img() {
+		is_stop = 0
+	}
+</script>
+</body>
+</html>
