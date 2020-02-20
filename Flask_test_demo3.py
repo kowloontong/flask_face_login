@@ -36,40 +36,23 @@ quit_flag  = False
 face_rec = Face_app()
 
 
-#自定义表单类，文本字段、密码字段、提交按钮
-# 需要自定义一个表单类
-class RegisterForm(FlaskForm):
-    username = StringField(u'用户名称:', validators=[DataRequired()])
-    password = PasswordField(u'输入密码:', validators=[DataRequired()])
-    password2 = PasswordField(u'确认密码:', validators=[DataRequired(), EqualTo(u'password', u'密码输入不一致')])
-    input = SubmitField(u'提交')
-
 #定义根路由视图函数，生成表单对象，获取表单数据，进行表单数据验证
 @app.route('/', methods=['GET', 'POST'])
 def form():
-    register_form = RegisterForm()
 
     if request.method == 'POST':
-        # 调用validate_on_submit方法, 可以一次性执行完所有的验证函数的逻辑
-        if register_form.validate_on_submit():
-            # 进入这里就表示所有的逻辑都验证成功
-            username = request.form.get('username')
-            password = request.form.get('password')
-            password2 = request.form.get('password2')
-            if username=='0000' and password=='0000' and password2=='0000':
-                session['success'] = 'xxx'
-                return redirect('/stream')
-            else:
-                flash('参数有误')
-            #print (username)
-            #return redirect('/stream')
-
+        # 进入这里就表示所有的逻辑都验证成功
+        username = request.form.get('username')
+        password = request.form.get('password')
+        if username=='0000' and password=='0000' :
+            session['success'] = 'xxx'
+            return redirect('/stream')
         else:
-            #message = register_form.errors.get('password2')[0]
-            #flash(message)
             flash('参数有误')
-
-    return render_template('sign_in.html', form=register_form)
+            #print(username,' ',password)
+        #print (username)
+        #return redirect('/stream')
+    return render_template('sign_in2.html')
 
 @app.route("/start_display")
 def action1():    # button

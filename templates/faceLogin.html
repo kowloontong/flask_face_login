@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>FACE LOGIN</title>
+    <title>人脸登录</title>
     <meta charset="utf-8">
 	<script src="../static/js/jquery-3.2.1.min.js"></script>
 	<script src="../static/js/ccv.js"></script>
@@ -10,7 +10,7 @@
 	<style>
 		body {
 		    text-align: center;
-			background-image:url(../static/background1.jpg);
+			background-image:url(../static/background2.jpg);
 		    color: white;
 		    font-size:40px;
 		    margin:auto;
@@ -19,17 +19,16 @@
 	</style>
 </head>
 <body>
-<h1>FACE LOGIN</h1>
+<h1>人脸识别登录系统</h1>
 <hr>
 
 <div class="video-container-2" >
-    <video id="video" width="400" height="300" muted class="abs" style="display: none;"></video>
+    <video id="video" width="400" height="300" muted class="abs" style="background:#c0c0c0;"></video>
 	<canvas id="canvas" width="400" height="300" style="background:#c0c0c0;"></canvas>
     <br>
 	<hr>
 <input type="button" title="开启摄像头" value="开启摄像头" onclick="getMedia()" />
 <input type="button" title="点击换一张" value="点击换一张" onclick="change_img()" />
-<strong>{{ message }}</strong></div>
 <script>
     //获得video摄像头区域
     let video = document.getElementById("video");
@@ -122,5 +121,6 @@
 		is_stop = 0
 	}
 </script>
+<p> @2020 Developed by zjh</p>
 </body>
 </html>
